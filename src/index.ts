@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 // import router
 import authRouter from "./routers/auth.router";
 
@@ -17,6 +17,12 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/auth", authRouter);
+
+// error handling response
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  console.log("Error :", error);
+  res.status(error.rc || 500).send(error);
+});
 
 app.listen(PORT, () => {
   console.log("BLOG API is RUNNING", PORT);
