@@ -4,12 +4,14 @@ import express, { Application, NextFunction, Request, Response } from "express";
 // import router
 import authRouter from "./routers/auth.router";
 import articleRouter from "./routers/article.router";
+import cors from "cors";
 
 const PORT: string | number = process.env.PORT || 2500;
 
 const app: Application = express();
 
 // define main middleware
+app.use(cors());
 app.use(express.json());
 
 // define routes
