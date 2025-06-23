@@ -1,9 +1,22 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { prisma } from "../config/prisma";
-export const createArticle = async (req: Request, res: Response) => {
+import { verify } from "jsonwebtoken";
+export const createArticle = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    console.log(req.header("Authorization"));
+    const token = req.header("Authorization")?.split(" ")[1];
+    if (!token) {
+      throw { rc: 401, message: "Token is not exist" };
+    }
+
+    const checkToken: any = verify(token, process.env.TOKEN_KEY || "secret");
+
     const article = await prisma.article.create({
-      data: req.body,
+      data: { ...req.body, userId: checkToken.id },
     });
     res.status(201).send({
       rc: 201,
@@ -11,7 +24,7 @@ export const createArticle = async (req: Request, res: Response) => {
       result: article,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 

@@ -3,6 +3,7 @@ dotenv.config();
 import express, { Application, NextFunction, Request, Response } from "express";
 // import router
 import authRouter from "./routers/auth.router";
+import articleRouter from "./routers/article.router";
 
 const PORT: string | number = process.env.PORT || 2500;
 
@@ -17,6 +18,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/article", articleRouter);
 
 // error handling response
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
