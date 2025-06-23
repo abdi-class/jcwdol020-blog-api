@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { prisma } from "../config/prisma";
 import { hashPassword } from "../utils/hash";
 import { compare } from "bcrypt";
+import { sign } from "jsonwebtoken";
 
 // REGISTER USER
 export const registerUser = async (
@@ -59,13 +60,19 @@ export const loginUser = async (
       throw { rc: 401, message: "Password is wrong" };
     }
 
-    res
-      .status(200)
-      .send({
-        username: findUser.username,
-        email: findUser.email,
-        imgProfile: findUser.imgProfile,
-      });
+    const token = sign(
+      { id: findUser.id, role: findUser.role },
+      process.env.TOKEN_KEY || "secret",
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).send({
+      username: findUser.username,
+      email: findUser.email,
+      imgProfile: findUser.imgProfile,
+      role: findUser.role,
+      token,
+    });
   } catch (error) {
     next(error);
   }
