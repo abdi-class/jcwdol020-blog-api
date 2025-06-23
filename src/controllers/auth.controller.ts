@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../config/prisma";
+import { hashPassword } from "../utils/hash";
 
 // REGISTER USER
 export const registerUser = async (
@@ -15,11 +16,15 @@ export const registerUser = async (
     });
 
     if (existingUser) {
-      throw { rc: 400, message: "User already exist" };
+      throw { rc: 400, success: false, message: "User already exist" };
     }
 
     const newUser = await prisma.user.create({
-      data: { ...req.body, role: req.body.role || "author" },
+      data: {
+        ...req.body,
+        password: await hashPassword(req.body.password),
+        role: req.body.role || "author",
+      },
     });
 
     res.status(201).send({
